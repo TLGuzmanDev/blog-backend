@@ -4,14 +4,14 @@ const connectDB = require('./config/db');
 const logger = require('morgan');
 const cors = require('cors');
 
+const router = require('./routes/api');
+
 const app = express();
 connectDB();
 app.use(cors());
 app.use(express.json());
 app.use(logger('dev'));
-app.use('/', (req, res) => {
-  res.send('Express App');
-});
+app.use('/api/', router);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is listening on Port ${process.env.PORT}`);
