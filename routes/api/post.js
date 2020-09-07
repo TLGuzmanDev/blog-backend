@@ -10,8 +10,8 @@ router.get('/:id', postController.get_post);
 
 router.post('/', postController.create_post);
 
-router.post('/:id', postController.update_post);
+router.put('/:id', postController.update_post);
 
-router.post('/:id', postController.remove_post);
+router.delete('/:id', postController.remove_post);
 
 module.exports = router;

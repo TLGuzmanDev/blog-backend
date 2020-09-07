@@ -2,7 +2,7 @@ const Post = require('../models/post');
 
 const get_all_posts = (req, res, next) => {
   Post.find()
-    .populate('user')
+    .populate({ path: 'user', select: 'first_name last_name email' })
     .exec((err, posts) => {
       if (err) {
         return next(err);
@@ -13,7 +13,7 @@ const get_all_posts = (req, res, next) => {
 
 const get_post = (req, res, next) => {
   Post.findById(req.params.id)
-    .populate('user')
+    .populate({ path: 'user', select: 'first_name last_name email' })
     .exec((err, post) => {
       if (err) {
         return next(err);
@@ -28,7 +28,7 @@ const get_post = (req, res, next) => {
 const create_post = (req, res, next) => {
   const post = new Post({
     user: req.body.user,
-    title: req.body.tile,
+    title: req.body.title,
     body: req.body.body,
   });
 
