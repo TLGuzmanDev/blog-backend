@@ -1,23 +1,81 @@
 const Post = require('../models/post');
 
 const get_all_posts = (req, res, next) => {
-  res.send('not implemented');
+  Post.find()
+    .populate('user')
+    .exec((err, posts) => {
+      if (err) {
+        return next(err);
+      }
+      return res.json(posts);
+    });
 };
 
 const get_post = (req, res, next) => {
-  res.send('not implemented');
+  Post.findById(req.params.id)
+    .populate('user')
+    .exec((err, post) => {
+      if (err) {
+        return next(err);
+      }
+      if (!post) {
+        return res.status(404).json({ error: 'post not found' });
+      }
+      return res.json(post);
+    });
 };
 
 const create_post = (req, res, next) => {
-  res.send('not implemented');
+  const post = new Post({
+    user: req.body.user,
+    title: req.body.tile,
+    body: req.body.body,
+  });
+
+  post.save((err, post) => {
+    if (err) {
+      return next(err);
+    }
+    return res.json(post);
+  });
 };
 
 const update_post = (req, res, next) => {
-  res.send('not implemented');
+  Post.findById(req.params.id).exec((err, post) => {
+    if (err) {
+      return next(err);
+    }
+    if (!post) {
+      return res.status(404).json({ error: 'post not found' });
+    }
+
+    post.title = req.body.title;
+    post.body = req.body.body;
+
+    post.save((err, post) => {
+      if (err) {
+        return next(err);
+      }
+      return res.json(post);
+    });
+  });
 };
 
 const remove_post = (req, res, next) => {
-  res.send('not implemented');
+  Post.findById(req.params.id).exec((err, post) => {
+    if (err) {
+      return next(err);
+    }
+    if (!post) {
+      return res.status(404).json({ error: 'post not found' });
+    }
+    post.remove((err, post) => {
+      if (err) {
+        return next(err);
+      }
+      res.json(post);
+    });
+  });
 };
 
 module.exports = {
