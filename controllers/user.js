@@ -30,7 +30,11 @@ const handle_login = (req, res) => {
     }
 
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
-    res.json({ token, email: user.email });
+    res.json({
+      token,
+      email: user.email,
+      name: `${user.first_name} ${user.last_name}`,
+    });
   });
 };
 
