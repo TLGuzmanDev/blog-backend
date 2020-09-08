@@ -1,4 +1,5 @@
 const Post = require('../models/post');
+const authenticate = require('../middleware/auth');
 
 const get_all_posts = (req, res, next) => {
   Post.find()
@@ -25,32 +26,14 @@ const get_post = (req, res, next) => {
     });
 };
 
-const create_post = (req, res, next) => {
-  const post = new Post({
-    user: req.body.user,
-    title: req.body.title,
-    body: req.body.body,
-  });
-
-  post.save((err, post) => {
-    if (err) {
-      return next(err);
-    }
-    return res.json(post);
-  });
-};
-
-const update_post = (req, res, next) => {
-  Post.findById(req.params.id).exec((err, post) => {
-    if (err) {
-      return next(err);
-    }
-    if (!post) {
-      return res.status(404).json({ error: 'post not found' });
-    }
-
-    post.title = req.body.title;
-    post.body = req.body.body;
+const create_post = [
+  authenticate,
+  (req, res, next) => {
+    const post = new Post({
+      user: req.decodedToken.id,
+      title: req.body.title,
+      body: req.body.body,
+    });
 
     post.save((err, post) => {
       if (err) {
@@ -58,25 +41,52 @@ const update_post = (req, res, next) => {
       }
       return res.json(post);
     });
-  });
-};
+  },
+];
 
-const remove_post = (req, res, next) => {
-  Post.findById(req.params.id).exec((err, post) => {
-    if (err) {
-      return next(err);
-    }
-    if (!post) {
-      return res.status(404).json({ error: 'post not found' });
-    }
-    post.remove((err, post) => {
+const update_post = [
+  authenticate,
+  (req, res, next) => {
+    Post.findById(req.params.id).exec((err, post) => {
       if (err) {
         return next(err);
       }
-      res.json(post);
+      if (!post) {
+        return res.status(404).json({ error: 'post not found' });
+      }
+
+      post.title = req.body.title;
+      post.body = req.body.body;
+
+      post.save((err, post) => {
+        if (err) {
+          return next(err);
+        }
+        return res.json(post);
+      });
     });
-  });
-};
+  },
+];
+
+const remove_post = [
+  authenticate,
+  (req, res, next) => {
+    Post.findById(req.params.id).exec((err, post) => {
+      if (err) {
+        return next(err);
+      }
+      if (!post) {
+        return res.status(404).json({ error: 'post not found' });
+      }
+      post.remove((err, post) => {
+        if (err) {
+          return next(err);
+        }
+        res.json(post);
+      });
+    });
+  },
+];
 
 module.exports = {
   get_all_posts,
