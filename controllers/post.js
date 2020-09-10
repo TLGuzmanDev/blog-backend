@@ -58,6 +58,10 @@ const update_post = [
       post.title = req.body.title;
       post.body = req.body.body;
 
+      if (req.body.hidden !== undefined) {
+        post.hidden = req.body.hidden;
+      }
+
       post.save((err, post) => {
         if (err) {
           return next(err);
